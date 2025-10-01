@@ -1,4 +1,6 @@
+
 import React from "react";
+import { colors } from "../styles/commonStyles";
 import {
   ActivityIndicator,
   Pressable,
@@ -8,10 +10,9 @@ import {
   useColorScheme,
   ViewStyle,
 } from "react-native";
-import { appleBlue, zincColors } from "@/constants/Colors";
 
-type ButtonVariant = "filled" | "outline" | "ghost";
-type ButtonSize = "sm" | "md" | "lg";
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
+type ButtonSize = 'small' | 'medium' | 'large';
 
 interface ButtonProps {
   onPress?: () => void;
@@ -26,103 +27,169 @@ interface ButtonProps {
 
 export const Button: React.FC<ButtonProps> = ({
   onPress,
-  variant = "filled",
-  size = "md",
+  variant = 'primary',
+  size = 'medium',
   disabled = false,
   loading = false,
   children,
   style,
   textStyle,
 }) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-
-  const sizeStyles: Record<
-    ButtonSize,
-    { height: number; fontSize: number; padding: number }
-  > = {
-    sm: { height: 36, fontSize: 14, padding: 12 },
-    md: { height: 44, fontSize: 16, padding: 16 },
-    lg: { height: 55, fontSize: 18, padding: 20 },
-  };
-
-  const getVariantStyle = () => {
-    const baseStyle: ViewStyle = {
-      borderRadius: 12,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-    };
-
+  const getButtonStyle = () => {
+    const baseStyle = [styles.button, styles[size]];
+    
     switch (variant) {
-      case "filled":
-        return {
-          ...baseStyle,
-          backgroundColor: isDark ? zincColors[50] : zincColors[900],
-        };
-      case "outline":
-        return {
-          ...baseStyle,
-          backgroundColor: "transparent",
-          borderWidth: 1,
-          borderColor: isDark ? zincColors[700] : zincColors[300],
-        };
-      case "ghost":
-        return {
-          ...baseStyle,
-          backgroundColor: "transparent",
-        };
+      case 'primary':
+        baseStyle.push(styles.primary);
+        break;
+      case 'secondary':
+        baseStyle.push(styles.secondary);
+        break;
+      case 'outline':
+        baseStyle.push(styles.outline);
+        break;
+      case 'ghost':
+        baseStyle.push(styles.ghost);
+        break;
     }
-  };
-
-  const getTextColor = () => {
+    
     if (disabled) {
-      return isDark ? zincColors[500] : zincColors[400];
+      baseStyle.push(styles.disabled);
     }
+    
+    return baseStyle;
+  };
 
+  const getTextStyle = () => {
+    const baseStyle = [styles.text, styles[`${size}Text`]];
+    
     switch (variant) {
-      case "filled":
-        return isDark ? zincColors[900] : zincColors[50];
-      case "outline":
-      case "ghost":
-        return appleBlue;
+      case 'primary':
+        baseStyle.push(styles.primaryText);
+        break;
+      case 'secondary':
+        baseStyle.push(styles.secondaryText);
+        break;
+      case 'outline':
+        baseStyle.push(styles.outlineText);
+        break;
+      case 'ghost':
+        baseStyle.push(styles.ghostText);
+        break;
     }
+    
+    if (disabled) {
+      baseStyle.push(styles.disabledText);
+    }
+    
+    return baseStyle;
   };
 
   return (
     <Pressable
-      onPress={onPress}
-      disabled={disabled || loading}
-      style={[
-        getVariantStyle(),
-        {
-          height: sizeStyles[size].height,
-          paddingHorizontal: sizeStyles[size].padding,
-          opacity: disabled ? 0.5 : 1,
-        },
+      style={({ pressed }) => [
+        ...getButtonStyle(),
+        pressed && styles.pressed,
         style,
       ]}
+      onPress={onPress}
+      disabled={disabled || loading}
     >
       {loading ? (
-        <ActivityIndicator color={getTextColor()} />
+        <ActivityIndicator 
+          size="small" 
+          color={variant === 'primary' ? 'white' : colors.primary} 
+        />
       ) : (
-        <Text
-          style={StyleSheet.flatten([
-            {
-              fontSize: sizeStyles[size].fontSize,
-              color: getTextColor(),
-              textAlign: "center",
-              marginBottom: 0,
-              fontWeight: "700",
-            },
-            textStyle,
-          ])}
-        >
+        <Text style={[...getTextStyle(), textStyle]}>
           {children}
         </Text>
       )}
     </Pressable>
   );
 };
+
+const styles = StyleSheet.create({
+  button: {
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  
+  // Sizes
+  small: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    minHeight: 36,
+  },
+  medium: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    minHeight: 44,
+  },
+  large: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    minHeight: 52,
+  },
+  
+  // Variants
+  primary: {
+    backgroundColor: colors.primary,
+  },
+  secondary: {
+    backgroundColor: colors.secondary,
+  },
+  outline: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  ghost: {
+    backgroundColor: 'transparent',
+  },
+  
+  // States
+  disabled: {
+    backgroundColor: colors.grey + '40',
+    borderColor: colors.grey + '40',
+  },
+  pressed: {
+    opacity: 0.8,
+  },
+  
+  // Text styles
+  text: {
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  smallText: {
+    fontSize: 14,
+  },
+  mediumText: {
+    fontSize: 16,
+  },
+  largeText: {
+    fontSize: 18,
+  },
+  
+  // Text variants
+  primaryText: {
+    color: 'white',
+  },
+  secondaryText: {
+    color: 'white',
+  },
+  outlineText: {
+    color: colors.primary,
+  },
+  ghostText: {
+    color: colors.primary,
+  },
+  disabledText: {
+    color: colors.grey,
+  },
+});
 
 export default Button;

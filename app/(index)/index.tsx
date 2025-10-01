@@ -1,181 +1,202 @@
-import React from "react";
-import { Stack, router } from "expo-router";
-import { FlatList, Pressable, StyleSheet, View, Text } from "react-native";
-// Components
-import { IconCircle } from "@/components/IconCircle";
-import { IconSymbol } from "@/components/IconSymbol";
-import { BodyScrollView } from "@/components/BodyScrollView";
-import { Button } from "@/components/button";
-// Constants & Hooks
-import { backgroundColors } from "@/constants/Colors";
 
-const ICON_COLOR = "#007AFF";
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { Stack, router } from 'expo-router';
+import { colors, commonStyles } from '../../styles/commonStyles';
+import { useVendingData } from '../../hooks/useVendingData';
+import { StatCard } from '../../components/StatCard';
+import { MachineCard } from '../../components/MachineCard';
+import { Button } from '../../components/button';
 
-export default function HomeScreen() {
+export default function Dashboard() {
+  const { 
+    machines, 
+    getTotalSales, 
+    getOperationalMachines, 
+    getLowStockAlerts 
+  } = useVendingData();
 
-  const modalDemos = [
-    {
-      title: "Standard Modal",
-      description: "Full screen modal presentation",
-      route: "/modal",
-      color: "#007AFF",
-    },
-    {
-      title: "Form Sheet",
-      description: "Bottom sheet with detents and grabber",
-      route: "/formsheet",
-      color: "#34C759",
-    },
-    {
-      title: "Transparent Modal",
-      description: "Overlay without obscuring background",
-      route: "/transparent-modal",
-      color: "#FF9500",
-    }
-  ];
+  const totalSales = getTotalSales();
+  const operationalMachines = getOperationalMachines();
+  const lowStockAlerts = getLowStockAlerts();
 
-  const renderModalDemo = ({ item }: { item: typeof modalDemos[0] }) => (
-    <View style={styles.demoCard}>
-      <View style={[styles.demoIcon, { backgroundColor: item.color }]}>
-        <IconSymbol name="square.grid.3x3" color="white" size={24} />
-      </View>
-      <View style={styles.demoContent}>
-        <Text style={styles.demoTitle}>{item.title}</Text>
-        <Text style={styles.demoDescription}>{item.description}</Text>
-      </View>
-      <Button
-        variant="outline"
-        size="sm"
-        onPress={() => router.push(item.route as any)}
-      >
-        Try It
-      </Button>
-    </View>
-  );
-
-  const renderEmptyList = () => (
-    <BodyScrollView contentContainerStyle={styles.emptyStateContainer}>
-      <IconCircle
-        emoji=""
-        backgroundColor={
-          backgroundColors[Math.floor(Math.random() * backgroundColors.length)]
-        }
-      />
-    </BodyScrollView>
-  );
-
-  const renderHeaderRight = () => (
-    <Pressable
-      onPress={() => {console.log("plus")}}
-      style={styles.headerButtonContainer}
-    >
-      <IconSymbol name="plus" color={ICON_COLOR} />
-    </Pressable>
-  );
-
-  const renderHeaderLeft = () => (
-    <Pressable
-      onPress={() => {console.log("gear")}}
-      style={styles.headerButtonContainer}
-    >
-      <IconSymbol
-        name="gear"
-        color={ICON_COLOR}
-      />
-    </Pressable>
-  );
+  console.log('Dashboard loaded with', machines.length, 'machines');
 
   return (
-    <>
-      <Stack.Screen
+    <View style={commonStyles.wrapper}>
+      <Stack.Screen 
         options={{
-          title: "Building the app...",
-          headerRight: renderHeaderRight,
-          headerLeft: renderHeaderLeft,
-        }}
+          title: 'Vending Machine Manager',
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.text,
+          headerTitleStyle: { fontWeight: 'bold' },
+        }} 
       />
-      <View style={styles.container}>
-        <FlatList
-          data={modalDemos}
-          renderItem={renderModalDemo}
-          keyExtractor={(item) => item.route}
-          contentContainerStyle={styles.listContainer}
-          contentInsetAdjustmentBehavior="automatic"
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
-    </>
+      
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
+          <Text style={styles.welcomeText}>Welcome back! 👋</Text>
+          <Text style={styles.subtitle}>Here&apos;s your vending machine overview</Text>
+
+          {/* Stats Overview */}
+          <View style={styles.statsContainer}>
+            <StatCard
+              title="Total Sales"
+              value={`$${totalSales.toFixed(2)}`}
+              subtitle="All time revenue"
+              emoji="💰"
+              color="#22c55e"
+            />
+            
+            <View style={styles.statsRow}>
+              <View style={styles.halfCard}>
+                <StatCard
+                  title="Operational"
+                  value={`${operationalMachines}/${machines.length}`}
+                  subtitle="Machines running"
+                  emoji="✅"
+                  color="#3b82f6"
+                />
+              </View>
+              
+              <View style={styles.halfCard}>
+                <StatCard
+                  title="Low Stock Alerts"
+                  value={lowStockAlerts.length}
+                  subtitle="Items need restocking"
+                  emoji="⚠️"
+                  color={lowStockAlerts.length > 0 ? "#ef4444" : "#22c55e"}
+                />
+              </View>
+            </View>
+          </View>
+
+          {/* Quick Actions */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Quick Actions</Text>
+            <View style={styles.buttonRow}>
+              <Button
+                style={styles.actionButton}
+                onPress={() => router.push('/inventory')}
+              >
+                📦 Inventory
+              </Button>
+              <Button
+                style={styles.actionButton}
+                onPress={() => router.push('/maintenance')}
+              >
+                🔧 Maintenance
+              </Button>
+            </View>
+          </View>
+
+          {/* Machines List */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Your Machines</Text>
+            {machines.map((machine) => (
+              <MachineCard key={machine.id} machine={machine} />
+            ))}
+          </View>
+
+          {/* Low Stock Alerts */}
+          {lowStockAlerts.length > 0 && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: '#ef4444' }]}>
+                🚨 Low Stock Alerts
+              </Text>
+              {lowStockAlerts.slice(0, 3).map((alert, index) => (
+                <View key={index} style={styles.alertCard}>
+                  <Text style={styles.alertText}>
+                    {alert.product.emoji} {alert.product.name} in {alert.machine.name}
+                  </Text>
+                  <Text style={styles.alertSubtext}>
+                    Only {alert.product.quantity} left
+                  </Text>
+                </View>
+              ))}
+              {lowStockAlerts.length > 3 && (
+                <Button
+                  style={styles.viewAllButton}
+                  onPress={() => router.push('/inventory')}
+                >
+                  View All Alerts ({lowStockAlerts.length})
+                </Button>
+              )}
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background,
   },
-  headerSection: {
+  content: {
     padding: 20,
-    paddingBottom: 16,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e5e5',
+    paddingBottom: 40,
   },
-  headerTitle: {
-    fontSize: 24,
+  welcomeText: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: colors.text,
     marginBottom: 8,
   },
-  headerSubtitle: {
+  subtitle: {
     fontSize: 16,
-    color: '#666',
-    lineHeight: 22,
+    color: colors.grey,
+    marginBottom: 24,
   },
-  listContainer: {
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+  statsContainer: {
+    marginBottom: 32,
   },
-  demoCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+  statsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    gap: 12,
   },
-  demoIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  demoContent: {
+  halfCard: {
     flex: 1,
   },
-  demoTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+  section: {
+    marginBottom: 32,
   },
-  demoDescription: {
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.text,
+    marginBottom: 16,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
+    backgroundColor: colors.primary,
+  },
+  alertCard: {
+    backgroundColor: colors.backgroundAlt,
+    borderRadius: 8,
+    padding: 12,
+    marginVertical: 4,
+    borderLeftWidth: 4,
+    borderLeftColor: '#ef4444',
+  },
+  alertText: {
     fontSize: 14,
-    color: '#666',
-    lineHeight: 18,
+    fontWeight: '600',
+    color: colors.text,
   },
-  emptyStateContainer: {
-    alignItems: "center",
-    gap: 8,
-    paddingTop: 100,
+  alertSubtext: {
+    fontSize: 12,
+    color: colors.grey,
+    marginTop: 2,
   },
-  headerButtonContainer: {
-    padding: 6, // Just enough padding around the 24px icon
+  viewAllButton: {
+    backgroundColor: colors.secondary,
+    marginTop: 8,
   },
 });

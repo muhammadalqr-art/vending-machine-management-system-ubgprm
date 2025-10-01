@@ -1,14 +1,19 @@
+
 import { StyleSheet, ViewStyle, TextStyle } from 'react-native';
 
 export const colors = {
-  primary: '#162456',    // Material Blue
-  secondary: '#193cb8',  // Darker Blue
-  accent: '#64B5F6',     // Light Blue
-  background: '#101824',  // Keeping dark background
-  backgroundAlt: '#162133',  // Keeping dark background
-  text: '#e3e3e3',       // Keeping light text
-  grey: '#90CAF9',       // Light Blue Grey
-  card: '#193cb8',       // Keeping dark card background
+  primary: '#3b82f6',      // Clean blue
+  secondary: '#1e40af',    // Darker blue
+  accent: '#10b981',       // Green accent
+  background: '#ffffff',   // White background
+  backgroundAlt: '#f8fafc', // Light gray background
+  text: '#1f2937',         // Dark gray text
+  grey: '#6b7280',         // Medium gray
+  card: '#ffffff',         // White cards
+  border: '#e5e7eb',       // Light border
+  success: '#10b981',      // Green
+  warning: '#f59e0b',      // Orange
+  error: '#ef4444',        // Red
 };
 
 export const buttonStyles = StyleSheet.create({
@@ -71,19 +76,19 @@ export const commonStyles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   card: {
-    backgroundColor: colors.backgroundAlt,
-    borderColor: colors.grey,
+    backgroundColor: colors.card,
+    borderColor: colors.border,
     borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
+    borderRadius: 12,
+    padding: 16,
     marginVertical: 8,
     width: '100%',
-    boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.1)',
+    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.1)',
     elevation: 2,
   },
   icon: {
     width: 60,
     height: 60,
-    tintColor: "white",
+    tintColor: colors.text,
   },
 });
