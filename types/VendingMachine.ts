@@ -37,3 +37,31 @@ export interface MaintenanceLog {
   timestamp: string;
   technician: string;
 }
+
+export interface Transaction {
+  id: string;
+  type: 'in' | 'out' | 'transfer';
+  machineId: string;
+  productId: string;
+  quantity: number;
+  timestamp: string;
+  reason: string;
+  // For transfers
+  fromMachineId?: string;
+  toMachineId?: string;
+  // For tracking
+  operatorName: string;
+}
+
+export interface TransferRequest {
+  id: string;
+  productId: string;
+  fromMachineId: string;
+  toMachineId: string;
+  quantity: number;
+  reason: string;
+  status: 'pending' | 'completed' | 'cancelled';
+  requestedBy: string;
+  timestamp: string;
+  completedAt?: string;
+}

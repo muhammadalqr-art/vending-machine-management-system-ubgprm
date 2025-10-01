@@ -1,5 +1,5 @@
 
-import { VendingMachine, Product, Sale, MaintenanceLog } from '../types/VendingMachine';
+import { VendingMachine, Product, Sale, MaintenanceLog, Transaction, TransferRequest } from '../types/VendingMachine';
 
 export const mockProducts: Product[] = [
   {
@@ -133,5 +133,66 @@ export const mockMaintenanceLogs: MaintenanceLog[] = [
     description: 'Restocked all beverages',
     timestamp: '2024-01-19T08:00:00Z',
     technician: 'Mike Davis'
+  }
+];
+
+export const mockTransactions: Transaction[] = [
+  {
+    id: '1',
+    type: 'in',
+    machineId: '1',
+    productId: '1',
+    quantity: 5,
+    timestamp: '2024-01-20T08:00:00Z',
+    reason: 'Weekly restock',
+    operatorName: 'John Smith'
+  },
+  {
+    id: '2',
+    type: 'out',
+    machineId: '2',
+    productId: '3',
+    quantity: 2,
+    timestamp: '2024-01-19T16:30:00Z',
+    reason: 'Expired products removal',
+    operatorName: 'Sarah Johnson'
+  },
+  {
+    id: '3',
+    type: 'transfer',
+    machineId: '3',
+    productId: '2',
+    quantity: 3,
+    timestamp: '2024-01-18T14:15:00Z',
+    reason: 'Slow moving inventory redistribution',
+    fromMachineId: '3',
+    toMachineId: '1',
+    operatorName: 'Mike Davis'
+  }
+];
+
+export const mockTransferRequests: TransferRequest[] = [
+  {
+    id: '1',
+    productId: '3',
+    fromMachineId: '3',
+    toMachineId: '1',
+    quantity: 2,
+    reason: 'Low demand in Break Room, high demand in Main Lobby',
+    status: 'pending',
+    requestedBy: 'System Auto-Transfer',
+    timestamp: '2024-01-20T12:00:00Z'
+  },
+  {
+    id: '2',
+    productId: '4',
+    fromMachineId: '2',
+    toMachineId: '3',
+    quantity: 1,
+    reason: 'Balancing inventory levels',
+    status: 'completed',
+    requestedBy: 'Mike Davis',
+    timestamp: '2024-01-19T10:30:00Z',
+    completedAt: '2024-01-19T15:45:00Z'
   }
 ];
